@@ -62,6 +62,8 @@
 
 - (void)cleanPlayer {
     
+    [self.displayView rendererWithTypeEmpty];
+    
 }
 
 - (UIView *)view {

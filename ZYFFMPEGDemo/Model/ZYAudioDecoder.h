@@ -13,28 +13,13 @@
 
 @interface ZYAudioDecoder : NSObject
 
-{
-@public
-    AVCodecContext *_codec_context;
-}
-
-@property (assign, nonatomic) double timebase;
-@property (assign, nonatomic) double fps;
-@property (assign, nonatomic) CGSize videoPresentationSize;
-@property (assign, nonatomic) CGFloat videoAspect;
 @property (assign, nonatomic) NSInteger streamIndex;
+@property (assign, nonatomic, readonly) int size;
 
-@property (strong, nonatomic) NSMutableArray <NSValue *> *packets;
-@property (strong, nonatomic) NSCondition *packetCondition;
-@property (strong, nonatomic) NSCondition *frameCondition;
-@property (assign, nonatomic) NSTimeInterval packetDuration;
-@property (assign, nonatomic) NSTimeInterval bufferedDuration;
-@property (strong, nonatomic) NSMutableArray *frames;
-@property (assign, nonatomic) int frameSize;
-@property (assign, nonatomic) int framePacketSize;
-@property (assign, nonatomic) NSTimeInterval frameDuration;
-@property (strong, nonatomic) NSLock *framePoolLock;
-@property (strong, nonatomic) NSMutableSet <ZYAudioFrame *> *unuseFrames;
-@property (strong, nonatomic) NSMutableSet <ZYAudioFrame *> *usedFrames;
++ (instancetype)audioDecoderWithCodecContext:(AVCodecContext *)codecContext timeBase:(NSTimeInterval)timeBase;
+
+- (BOOL)decodePacket:(AVPacket)packet;
+- (void)clean;
+- (void)destroyAudioTrack;
 
 @end

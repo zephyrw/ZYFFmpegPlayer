@@ -7,7 +7,19 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "ZYFFFrame.h"
 
-@interface ZYAudioFrame : NSObject
+@interface ZYAudioFrame : ZYFFFrame
+
+{
+@public
+    float * samples;
+    int length;
+    int output_offset;
+}
+
+//@property (nonatomic, assign) SGFFFrameType type;
+
+- (void)setSamplesLength:(NSUInteger)samplesLength;
 
 @end

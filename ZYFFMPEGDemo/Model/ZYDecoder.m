@@ -24,7 +24,6 @@
 @property (assign, nonatomic) BOOL videoEnable;
 @property (assign, nonatomic) BOOL audioEnable;
 @property (assign, nonatomic) BOOL reading;
-@property (assign, nonatomic) int packetSize;
 @property (strong, nonatomic) ZYVideoDecoder *videoDecoder;
 @property (strong, nonatomic) ZYAudioDecoder *audioDecoder;
 @property (strong, nonatomic) NSOperationQueue *operationQueue;
@@ -145,13 +144,14 @@ static NSTimeInterval max_packet_sleep_full_time_interval = 0.1;
     
 }
 
+
 - (void)findStreamWithMediaType:(int)mediaType {
     
     AVCodec *codec;
     
     NSString *mediaTypeStr = mediaType == AVMEDIA_TYPE_VIDEO ? @"video" : @"audio";
     
-    int streamIndex = av_find_best_stream(_format_context, AVMEDIA_TYPE_VIDEO, -1, -1, &codec, 0);
+    int streamIndex = av_find_best_stream(_format_context, mediaType, -1, -1, &codec, 0);
     
     if (streamIndex < 0) {
         NSLog(@"Failed to find stream: %@!", mediaTypeStr);
@@ -193,21 +193,14 @@ static NSTimeInterval max_packet_sleep_full_time_interval = 0.1;
     }
     
     if (mediaType == AVMEDIA_TYPE_VIDEO) {
+        self.videoDecoder = [ZYVideoDecoder videoDecoderWithCodecContext:codecContext timeBase:timeBase fps:fps];
         self.videoEnable = YES;
-        self.videoDecoder = [ZYVideoDecoder new];
         self.videoDecoder.streamIndex = streamIndex;
-        self.videoDecoder.timebase = timeBase;
-        self.videoDecoder.fps = fps;
-        self.videoDecoder->_codec_context = codecContext;
     } else {
+        self.audioDecoder = [ZYAudioDecoder audioDecoderWithCodecContext:codecContext timeBase:timeBase];
         self.audioEnable = YES;
-        self.audioDecoder = [ZYAudioDecoder new];
         self.audioDecoder.streamIndex = streamIndex;
-        self.audioDecoder.timebase = timeBase;
-        self.audioDecoder.fps = fps;
-        self.audioDecoder->_codec_context = codecContext;
     }
-    
 }
 
 - (void)readPacket {
@@ -217,7 +210,7 @@ static NSTimeInterval max_packet_sleep_full_time_interval = 0.1;
     BOOL isFinished = NO;
     while (!isFinished) {
         
-        if (self.packetSize >= max_packet_buffer_size) {
+        if (self.videoDecoder.packetSize + self.audioDecoder.size >= max_packet_buffer_size) {
             NSTimeInterval interval = 0;
 //            if (self.paused) {
 //                interval = max_packet_sleep_full_and_pause_time_interval;
@@ -236,8 +229,16 @@ static NSTimeInterval max_packet_sleep_full_time_interval = 0.1;
         }
         
         if (self.videoEnable && packet.stream_index == self.videoDecoder.streamIndex) {
+            
             [self.videoDecoder savePacket:packet];
+            
+        }else if (self.audioEnable && packet.stream_index == self.audioDecoder.streamIndex) {
+            
+            [self.audioDecoder decodePacket:packet];
+            
         }
+        
+        
     }
     
 }
@@ -254,6 +255,11 @@ static NSTimeInterval max_packet_sleep_full_time_interval = 0.1;
     if (self.videoDecoder) {
         [self.videoDecoder clean];
     }
+    
+    if (self.audioDecoder) {
+        [self.audioDecoder clean];
+    }
+    
     dispatch_async(dispatch_get_global_queue(0, 0), ^{
         [self.operationQueue cancelAllOperations];
         [self.operationQueue waitUntilAllOperationsAreFinished];
@@ -266,9 +272,16 @@ static NSTimeInterval max_packet_sleep_full_time_interval = 0.1;
 - (void)destroyFormatContext {
     
     self.videoEnable = NO;
+    self.audioEnable = NO;
+    
     if (self.videoDecoder) {
         [self.videoDecoder destroyVideoTrack];
     }
+    
+    if (self.audioDecoder) {
+        [self.audioDecoder destroyAudioTrack];
+    }
+    
     if (_format_context)
     {
         avformat_close_input(&_format_context);

@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "avformat.h"
+#import "ZYFFFrame.h"
 
 typedef NS_ENUM(NSUInteger, SGFFVideoFrameRotateType) {
     SGFFVideoFrameRotateType0,
@@ -23,7 +24,7 @@ typedef NS_ENUM(int, SGYUVChannel) {
     SGYUVChannelCount = 3,
 };
 
-@interface ZYVideoFrame : NSObject
+@interface ZYVideoFrame : ZYFFFrame
 
 {
 @public
@@ -39,26 +40,6 @@ typedef NS_ENUM(int, SGYUVChannel) {
  旋转角度
  */
 @property (nonatomic, assign) SGFFVideoFrameRotateType rotateType;
-
-/**
- 当前视频桢的位置
- */
-@property (nonatomic, assign) NSTimeInterval position;
-
-/**
- 当前视频frame的时长
- */
-@property (nonatomic, assign) NSTimeInterval duration;
-
-/**
- 当前视频Frame的大小
- */
-@property (nonatomic, assign, readonly) int size;
-
-/**
- 解压之前包的大小
- */
-@property (nonatomic, assign) int packetSize;
 
 /**
  宽度
@@ -78,9 +59,5 @@ typedef NS_ENUM(int, SGYUVChannel) {
  @param height 视频高度
  */
 - (void)setFrameData:(AVFrame *)frame width:(int)width height:(int)height;
-
-- (void)startPlaying;
-- (void)stopPlaying;
-- (void)cancel;
 
 @end

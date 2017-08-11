@@ -52,4 +52,6 @@ typedef NS_ENUM(NSUInteger, ZYGravityMode) {
  */
 - (void)replaceVideoWithURL:(NSURL *)videoURL;
 
+- (void)clean;
+
 @end

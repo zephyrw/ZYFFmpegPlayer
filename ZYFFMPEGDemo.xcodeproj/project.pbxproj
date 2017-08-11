@@ -22,6 +22,9 @@
 		3E209B961F3D495E0038F51B /* ZYAudioDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E209B951F3D495E0038F51B /* ZYAudioDecoder.m */; };
 		3E209B991F3D496E0038F51B /* ZYVideoDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E209B981F3D496E0038F51B /* ZYVideoDecoder.m */; };
 		3E209B9C1F3D4A7C0038F51B /* ZYAudioFrame.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E209B9B1F3D4A7C0038F51B /* ZYAudioFrame.m */; };
+		3E209B9F1F3D82CA0038F51B /* ZYFrameQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E209B9E1F3D82CA0038F51B /* ZYFrameQueue.m */; };
+		3E209BA21F3D837F0038F51B /* ZYFFFrame.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E209BA11F3D837F0038F51B /* ZYFFFrame.m */; };
+		3E209BA51F3D89EF0038F51B /* ZYPacketQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E209BA41F3D89EF0038F51B /* ZYPacketQueue.m */; };
 		3E83BD791F2F158500BC1A50 /* libavcodec.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E83BD721F2F158500BC1A50 /* libavcodec.a */; };
 		3E83BD7A1F2F158500BC1A50 /* libavdevice.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E83BD731F2F158500BC1A50 /* libavdevice.a */; };
 		3E83BD7B1F2F158500BC1A50 /* libavfilter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E83BD741F2F158500BC1A50 /* libavfilter.a */; };
@@ -76,6 +79,12 @@
 		3E209B981F3D496E0038F51B /* ZYVideoDecoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZYVideoDecoder.m; sourceTree = "<group>"; };
 		3E209B9A1F3D4A7C0038F51B /* ZYAudioFrame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZYAudioFrame.h; sourceTree = "<group>"; };
 		3E209B9B1F3D4A7C0038F51B /* ZYAudioFrame.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZYAudioFrame.m; sourceTree = "<group>"; };
+		3E209B9D1F3D82CA0038F51B /* ZYFrameQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZYFrameQueue.h; sourceTree = "<group>"; };
+		3E209B9E1F3D82CA0038F51B /* ZYFrameQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZYFrameQueue.m; sourceTree = "<group>"; };
+		3E209BA01F3D837F0038F51B /* ZYFFFrame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZYFFFrame.h; sourceTree = "<group>"; };
+		3E209BA11F3D837F0038F51B /* ZYFFFrame.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZYFFFrame.m; sourceTree = "<group>"; };
+		3E209BA31F3D89EF0038F51B /* ZYPacketQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZYPacketQueue.h; sourceTree = "<group>"; };
+		3E209BA41F3D89EF0038F51B /* ZYPacketQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZYPacketQueue.m; sourceTree = "<group>"; };
 		3E83BD721F2F158500BC1A50 /* libavcodec.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libavcodec.a; sourceTree = "<group>"; };
 		3E83BD731F2F158500BC1A50 /* libavdevice.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libavdevice.a; sourceTree = "<group>"; };
 		3E83BD741F2F158500BC1A50 /* libavfilter.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libavfilter.a; sourceTree = "<group>"; };
@@ -266,6 +275,12 @@
 				3E209B981F3D496E0038F51B /* ZYVideoDecoder.m */,
 				3E209B941F3D495E0038F51B /* ZYAudioDecoder.h */,
 				3E209B951F3D495E0038F51B /* ZYAudioDecoder.m */,
+				3E209B9D1F3D82CA0038F51B /* ZYFrameQueue.h */,
+				3E209B9E1F3D82CA0038F51B /* ZYFrameQueue.m */,
+				3E209BA31F3D89EF0038F51B /* ZYPacketQueue.h */,
+				3E209BA41F3D89EF0038F51B /* ZYPacketQueue.m */,
+				3E209BA01F3D837F0038F51B /* ZYFFFrame.h */,
+				3E209BA11F3D837F0038F51B /* ZYFFFrame.m */,
 				3E209B6D1F3C04B60038F51B /* ZYVideoFrame.h */,
 				3E209B6E1F3C04B60038F51B /* ZYVideoFrame.m */,
 				3E209B9A1F3D4A7C0038F51B /* ZYAudioFrame.h */,
@@ -637,16 +652,19 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3E209BA21F3D837F0038F51B /* ZYFFFrame.m in Sources */,
 				3E209B7A1F3C04B60038F51B /* ZYProgramYUV420.m in Sources */,
 				3E209B9C1F3D4A7C0038F51B /* ZYAudioFrame.m in Sources */,
 				3EF216121F20557C001DDD35 /* AppDelegate.m in Sources */,
 				3E209B961F3D495E0038F51B /* ZYAudioDecoder.m in Sources */,
 				3E209B8A1F3C473E0038F51B /* ZYPlayerViewController.m in Sources */,
+				3E209B9F1F3D82CA0038F51B /* ZYFrameQueue.m in Sources */,
 				3E209B821F3C2EA20038F51B /* ZYDisplayView.m in Sources */,
 				3E209B8D1F3C4EF30038F51B /* GLESUtils.m in Sources */,
 				3E209B771F3C04B60038F51B /* ViewController.m in Sources */,
 				3EF2160F1F20557C001DDD35 /* main.m in Sources */,
 				3E209B791F3C04B60038F51B /* ZYDecoder.m in Sources */,
+				3E209BA51F3D89EF0038F51B /* ZYPacketQueue.m in Sources */,
 				3E209B7C1F3C04B60038F51B /* ZYVideoFrame.m in Sources */,
 				3E209B781F3C04B60038F51B /* ZYGLViewController.m in Sources */,
 				3E209B871F3C30FE0038F51B /* ZYPlayer.m in Sources */,

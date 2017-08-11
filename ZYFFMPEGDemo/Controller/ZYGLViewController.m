@@ -99,6 +99,12 @@
     }
 }
 
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+    
+    self.aspect = arc4random() % 2 ? 16.0 / 9.0 : 4.0 / 3.0;
+    
+}
+
 - (void)reloadViewport {
     
     GLKView * glView = (GLKView *)self.view;
