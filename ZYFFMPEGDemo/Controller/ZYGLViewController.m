@@ -95,9 +95,7 @@
 {
     if (_aspect != aspect) {
         _aspect = aspect;
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self reloadViewport];
-        });
+        [self reloadViewport];
     }
 }
 
@@ -162,6 +160,7 @@
     
     self.currentFrame = [self.displayView.abstractPlayer.decoder getVideoFrameWithCurrentPosition:self.currentFrame.position currentDuration:self.currentFrame.duration];
     [self.currentFrame startPlaying];
+    self.currentFrame = [self.displayView.abstractPlayer.decoder getFrameAsync];
     if (self.currentFrame.size < 0) {
         return NO;
     }

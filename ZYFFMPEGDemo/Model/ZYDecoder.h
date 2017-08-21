@@ -31,6 +31,7 @@
 @property (weak, nonatomic) id<ZYDecoderDelegate> delegate;
 
 /**
+<<<<<<< HEAD
  是否正在缓冲
  */
 @property (nonatomic, assign, readonly) BOOL buffering;
@@ -70,6 +71,8 @@
 @property (atomic, assign) NSTimeInterval videoFrameDuration;
 
 /**
+=======
+>>>>>>> de117360353a7871623c8666cdfa5e3caf465776
  初始化解码器
 
  @param videoURL 视频URL

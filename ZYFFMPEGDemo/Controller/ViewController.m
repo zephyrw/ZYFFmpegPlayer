@@ -23,7 +23,7 @@
     self.fileNameArr = @[
                          [self pathWithFileName:@"VR"],
                          [self pathWithFileName:@"google-help-vr"],
-                         [self pathWithFileName:@"i-see-fire"],
+                         [self pathWithFileName:@"i-see-fire"]
                          ];
     
 }

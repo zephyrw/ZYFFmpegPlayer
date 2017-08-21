@@ -41,6 +41,7 @@
 		3E83C00C1F30532100BC1A50 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E83C00B1F30532100BC1A50 /* QuartzCore.framework */; };
 		3E8AE6CB1F414B5100759AA9 /* ZYAudioManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E8AE6CA1F414B5100759AA9 /* ZYAudioManager.m */; };
 		3E8AE72B1F43E30200759AA9 /* ZYPlayerViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3E8AE72A1F43E30200759AA9 /* ZYPlayerViewController.xib */; };
+
 		3EF2160F1F20557C001DDD35 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 3EF2160E1F20557C001DDD35 /* main.m */; };
 		3EF216121F20557C001DDD35 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3EF216111F20557C001DDD35 /* AppDelegate.m */; };
 		3EF216181F20557C001DDD35 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3EF216161F20557C001DDD35 /* Main.storyboard */; };
@@ -102,10 +103,12 @@
 		3E83C0071F30530500BC1A50 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		3E83C0091F30531000BC1A50 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
 		3E83C00B1F30532100BC1A50 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+
 		3E8AE6C91F414B5100759AA9 /* ZYAudioManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZYAudioManager.h; sourceTree = "<group>"; };
 		3E8AE6CA1F414B5100759AA9 /* ZYAudioManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZYAudioManager.m; sourceTree = "<group>"; };
 		3E8AE7221F42E5AE00759AA9 /* ZYConsts.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZYConsts.h; sourceTree = "<group>"; };
 		3E8AE72A1F43E30200759AA9 /* ZYPlayerViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ZYPlayerViewController.xib; sourceTree = "<group>"; };
+
 		3EF2160A1F20557C001DDD35 /* ZYFFMPEGDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ZYFFMPEGDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3EF2160E1F20557C001DDD35 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		3EF216101F20557C001DDD35 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -802,12 +805,19 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = X46N782Q77;
 				HEADER_SEARCH_PATHS = "$(SRCROOT)/ZYFFMPEGDemo/FFmpeg-iOS/include";
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/ZYFFMPEGDemo/FFmpeg-iOS/include",
+					"\"$(SRCROOT)/ZYFFMPEGDemo/SDL2/include\"",
+					"\"$(SRCROOT)/../../../../../Downloads/SDL2-2.0.5/include\"",
+					"\"$(SRCROOT)/../../../../../../Downloads/SDL2-2.0.5/include\"",
+				);
 				INFOPLIST_FILE = ZYFFMPEGDemo/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/ZYFFMPEGDemo/FFmpeg-iOS/lib",
+					"$(PROJECT_DIR)/ZYFFMPEGDemo/SDL2",
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = wpsd.ZYFFMPEGDemo;
@@ -821,6 +831,12 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = X46N782Q77;
 				HEADER_SEARCH_PATHS = "$(SRCROOT)/ZYFFMPEGDemo/FFmpeg-iOS/include";
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/ZYFFMPEGDemo/FFmpeg-iOS/include",
+					"\"$(SRCROOT)/ZYFFMPEGDemo/SDL2/include\"",
+					"\"$(SRCROOT)/../../../../../Downloads/SDL2-2.0.5/include\"",
+					"\"$(SRCROOT)/../../../../../../Downloads/SDL2-2.0.5/include\"",
+				);
 				INFOPLIST_FILE = ZYFFMPEGDemo/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";

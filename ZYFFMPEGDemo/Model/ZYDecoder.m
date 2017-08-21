@@ -139,6 +139,7 @@ static NSTimeInterval max_packet_sleep_full_time_interval = 0.1;
         self.readPacketOperation.queuePriority = NSOperationQueuePriorityVeryHigh;
         self.readPacketOperation.qualityOfService = NSQualityOfServiceUserInitiated;
         [self.readPacketOperation addDependency:self.openFileOperation];
+        [self.openFileOperation addDependency:self.openFileOperation];
         [self.operationQueue addOperation:self.readPacketOperation];
     }
     
@@ -441,7 +442,6 @@ static NSTimeInterval max_packet_sleep_full_time_interval = 0.1;
 
 - (void)closeFile {
     
-//    NSLog(@"Close decoder");
     if (self.videoDecoder) {
         [self.videoDecoder clean];
         self.videoDecoder = nil;
