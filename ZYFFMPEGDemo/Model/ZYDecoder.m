@@ -139,7 +139,6 @@ static NSTimeInterval max_packet_sleep_full_time_interval = 0.1;
         self.readPacketOperation.queuePriority = NSOperationQueuePriorityVeryHigh;
         self.readPacketOperation.qualityOfService = NSQualityOfServiceUserInitiated;
         [self.readPacketOperation addDependency:self.openFileOperation];
-        [self.openFileOperation addDependency:self.openFileOperation];
         [self.operationQueue addOperation:self.readPacketOperation];
     }
     

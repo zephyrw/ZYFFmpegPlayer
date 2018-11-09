@@ -61,35 +61,36 @@
 
 - (void)stateAction:(NSNotification *)noti {
     
-    ZYPlayerState state = [[noti.userInfo objectForKey:kCurrentKey] integerValue];
-     
-    NSString * text;
-    switch (state) {
-        case ZYPlayerStateNone:
-            text = @"None";
-            break;
-        case ZYPlayerStateBuffering:
-            text = @"Buffering...";
-            break;
-        case ZYPlayerStateReadyToPlay:
-            text = @"Prepare";
-            self.totalTimeLabel.text = [self timeStringFromSeconds:self.player.duration];
-            [self.player play];
-            break;
-        case ZYPlayerStatePlaying:
-            text = @"Playing";
-            break;
-        case ZYPlayerStateSuspend:
-            text = @"Suspend";
-            break;
-        case ZYPlayerStateFinished:
-            text = @"Finished";
-            break;
-        case ZYPlayerStateFailed:
-            text = @"Error";
-            break;
-    }
-    self.stateLabel.text = text;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        ZYPlayerState state = [[noti.userInfo objectForKey:kCurrentKey] integerValue];
+        NSString * text;
+        switch (state) {
+            case ZYPlayerStateNone:
+                text = @"None";
+                break;
+            case ZYPlayerStateBuffering:
+                text = @"Buffering...";
+                break;
+            case ZYPlayerStateReadyToPlay:
+                text = @"Prepare";
+                self.totalTimeLabel.text = [self timeStringFromSeconds:self.player.duration];
+                [self.player play];
+                break;
+            case ZYPlayerStatePlaying:
+                text = @"Playing";
+                break;
+            case ZYPlayerStateSuspend:
+                text = @"Suspend";
+                break;
+            case ZYPlayerStateFinished:
+                text = @"Finished";
+                break;
+            case ZYPlayerStateFailed:
+                text = @"Error";
+                break;
+        }
+        self.stateLabel.text = text;
+    });
 }
 
 - (void)progressChanged:(NSNotification *)noti {
