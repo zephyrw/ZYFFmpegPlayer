@@ -55,9 +55,11 @@
 - (ZYAudioFrame *)getFrameSync;
 
 /**
- 清空frame queue
+ flush frame queue
  */
 - (void)clean;
+
+- (void)destroy;
 
 /**
  关闭codec context

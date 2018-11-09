@@ -31,7 +31,6 @@
 @property (weak, nonatomic) id<ZYDecoderDelegate> delegate;
 
 /**
-<<<<<<< HEAD
  是否正在缓冲
  */
 @property (nonatomic, assign, readonly) BOOL buffering;
@@ -56,6 +55,9 @@
 @property (assign, nonatomic, readonly) BOOL videoEnable;
 
 @property (assign, nonatomic, readonly) NSTimeInterval progress;
+@property (atomic, assign) NSTimeInterval videoFrameTimeClock;
+@property (atomic, assign) NSTimeInterval videoFramePosition;
+@property (atomic, assign) NSTimeInterval videoFrameDuration;
 
 /**
  音频是否可用
@@ -66,13 +68,8 @@
 @property (atomic, assign) NSTimeInterval audioFramePosition;
 @property (atomic, assign) NSTimeInterval audioFrameDuration;
 
-@property (atomic, assign) NSTimeInterval videoFrameTimeClock;
-@property (atomic, assign) NSTimeInterval videoFramePosition;
-@property (atomic, assign) NSTimeInterval videoFrameDuration;
 
 /**
-=======
->>>>>>> de117360353a7871623c8666cdfa5e3caf465776
  初始化解码器
 
  @param videoURL 视频URL

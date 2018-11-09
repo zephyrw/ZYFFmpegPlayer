@@ -35,6 +35,10 @@
 @property (assign, nonatomic) BOOL seeking;
 @property (assign, nonatomic) BOOL prepareToDecode;
 @property (assign, nonatomic) BOOL closed;
+@property (nonatomic, assign) NSTimeInterval seekToTime;
+@property (nonatomic, assign) NSTimeInterval seekMinTime;       // default is 0
+@property (nonatomic, copy) void (^seekCompleteHandler)(BOOL finished);
+@property (nonatomic, strong) NSError * error;
 
 @end
 
@@ -43,6 +47,23 @@
 static const int max_packet_buffer_size = 15 * 1024 * 1024;
 static NSTimeInterval max_packet_sleep_full_time_interval = 0.1;
 //static NSTimeInterval max_packet_sleep_full_and_pause_time_interval = 0.5;
+
+NSError * SGFFCheckError(int result)
+{
+    return SGFFCheckErrorCode(result, -1);
+}
+
+NSError * SGFFCheckErrorCode(int result, NSUInteger errorCode)
+{
+    if (result < 0) {
+        char * error_string_buffer = malloc(256);
+        av_strerror(result, error_string_buffer, 256);
+        NSString * error_string = [NSString stringWithFormat:@"ffmpeg code : %d, ffmpeg msg : %s", result, error_string_buffer];
+        NSError * error = [NSError errorWithDomain:error_string code:errorCode userInfo:nil];
+        return error;
+    }
+    return nil;
+}
 
 + (instancetype)decoderWithVideoURL:(NSURL *)videoURL {
     
@@ -221,47 +242,103 @@ static NSTimeInterval max_packet_sleep_full_time_interval = 0.1;
 
 - (void)readPacket {
     
-    AVPacket packet;
+    [self cleanAudioFrame];
+    [self cleanVideoFrame];
     
-    while (YES) {
-        
-        if (self.videoDecoder.packetSize + self.audioDecoder.size >= max_packet_buffer_size) {
-            NSTimeInterval interval = 0;
-//            if (self.paused) {
-//                interval = max_packet_sleep_full_and_pause_time_interval;
-//            } else {
-            interval = max_packet_sleep_full_time_interval;
+    [self.videoDecoder clean];
+    [self.audioDecoder clean];
+    
+    self.reading = YES;
+    BOOL finished = NO;
+    AVPacket packet;
+    while (!finished) {
+        if (self.closed || self.error) {
+            NSLog(@"read packet thread quit");
+            break;
+        }
+        if (self.seeking) {
+            self.endOfFile = NO;
+            self.playbackFinished = NO;
+            
+            [self.formatContext seekFileWithFFTimebase:self.seekToTime];
+            
+            self.buffering = YES;
+            [self.audioDecoder clean];
+            [self.videoDecoder clean];
+            self.videoDecoder.paused = NO;
+            self.videoDecoder.endOfFile = NO;
+            self.seeking = NO;
+            self.seekToTime = 0;
+            if (self.seekCompleteHandler) {
+                self.seekCompleteHandler(YES);
+                self.seekCompleteHandler = nil;
+            }
+            [self cleanAudioFrame];
+            [self cleanVideoFrame];
+            [self updateBufferedDurationByVideo];
+            [self updateBufferedDurationByAudio];
+            continue;
+        }
+//        if (self.selectAudioTrack) {
+//            NSError * selectResult = [self.formatContext selectAudioTrackIndex:self.selectAudioTrackIndex];
+//            if (!selectResult) {
+//                [self.audioDecoder destroy];
+//                self.audioDecoder = [SGFFAudioDecoder decoderWithCodecContext:self.formatContext->_audio_codec_context
+//                                                                     timebase:self.formatContext.audioTimebase
+//                                                                     delegate:self];
+//                if (!self.playbackFinished) {
+//                    [self seekToTime:self.progress];
+//                }
 //            }
+//            self.selectAudioTrack = NO;
+//            self.selectAudioTrackIndex = 0;
+//            continue;
+//        }
+        if (self.audioDecoder.size + self.videoDecoder.packetSize >= max_packet_buffer_size) {
+            NSTimeInterval interval = 0;
+            if (self.paused) {
+                interval = max_packet_sleep_full_time_interval;
+            } else {
+                interval = max_packet_sleep_full_time_interval;
+            }
             NSLog(@"read thread sleep : %f", interval);
             [NSThread sleepForTimeInterval:interval];
             continue;
         }
         
+        // read frame
         int result = av_read_frame(_format_context, &packet);
-        if (result < 0) {
-            NSLog(@"Finish to read frame!");
+        if (result < 0)
+        {
+            NSLog(@"read packet finished");
             self.endOfFile = YES;
             self.videoDecoder.endOfFile = YES;
+            finished = YES;
             if ([self.delegate respondsToSelector:@selector(decoderDidEndOfFile:)]) {
                 [self.delegate decoderDidEndOfFile:self];
             }
             break;
         }
-        
-        if (self.videoEnable && packet.stream_index == self.videoDecoder.streamIndex) {
-            
+        if (packet.stream_index == self.videoDecoder.streamIndex && self.videoEnable)
+        {
+            NSLog(@"video : put packet");
             [self.videoDecoder savePacket:packet];
             [self updateBufferedDurationByVideo];
-            
-        }else if (self.audioEnable && packet.stream_index == self.audioDecoder.streamIndex) {
-            
-            if (![self.audioDecoder decodePacket:packet]) {
-                NSLog(@"Failed to decode audio packet");
+        }
+        else if (packet.stream_index == self.audioDecoder.streamIndex && self.audioEnable)
+        {
+            NSLog(@"audio : put packet");
+            int result = [self.audioDecoder decodePacket:packet];
+            if (result < 0) {
+                self.error = [NSError errorWithDomain:@"audio" code:result userInfo:<#(nullable NSDictionary<NSErrorUserInfoKey,id> *)#>] SGFFCheckErrorCode(result, SGFFDecoderErrorCodeCodecAudioSendPacket);
+                [self delegateErrorCallback];
                 continue;
             }
             [self updateBufferedDurationByAudio];
         }
     }
+    self.reading = NO;
+    [self checkBufferingStatus];
     
 }
 
@@ -302,7 +379,40 @@ static NSTimeInterval max_packet_sleep_full_time_interval = 0.1;
 }
 
 - (void)seekToTime:(NSTimeInterval)time {
+    [self seekToTime:time completeHandler:nil];
+}
+
+- (void)seekToTime:(NSTimeInterval)time completeHandler:(void (^)(BOOL finished))completeHandler
+{
+    if (self.error) {
+        if (completeHandler) {
+            completeHandler(NO);
+        }
+        return;
+    }
+    NSTimeInterval tempDuration = 8;
+    if (!self.audioEnable) {
+        tempDuration = 15;
+    }
     
+    NSTimeInterval seekMaxTime = self.duration - (self.minBufferedDruation + tempDuration);
+    if (seekMaxTime < self.seekMinTime) {
+        seekMaxTime = self.seekMinTime;
+    }
+    if (time > seekMaxTime) {
+        time = seekMaxTime;
+    } else if (time < self.seekMinTime) {
+        time = self.seekMinTime;
+    }
+    self.progress = time;
+    self.seekToTime = time;
+    self.seekCompleteHandler = completeHandler;
+    self.seeking = YES;
+    self.videoDecoder.paused = YES;
+    
+    if (self.endOfFile) {
+        [self setupReadPacketOperation];
+    }
 }
 
 - (void)setBufferedDuration:(NSTimeInterval)bufferedDuration

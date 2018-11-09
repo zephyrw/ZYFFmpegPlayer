@@ -47,10 +47,6 @@
     self.player.view.frame = self.view.bounds;
 }
 
-- (IBAction)sliderValueChanged:(UISlider *)sender {
-    
-}
-
 - (IBAction)playButtonClick:(UIButton *)sender {
     [self.player play];
 }
@@ -92,6 +88,9 @@
         self.stateLabel.text = text;
     });
 }
+- (IBAction)sliderTouchDown:(UISlider *)sender {
+    [self.player pause];
+}
 
 - (void)progressChanged:(NSNotification *)noti {
     
@@ -101,6 +100,14 @@
 //        NSLog(@"%f", self.slider.value);
     });
     
+}
+
+- (IBAction)sliderValueChanged:(UISlider *)sender {
+    
+}
+
+- (IBAction)sliderTouchUp:(UISlider *)sender {
+    [self.player play];
 }
 
 - (void)decodeError:(NSNotification *)noti {

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="12118" systemVersion="17A291j" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12086"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -26,7 +26,10 @@
                 <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="GRy-VQ-mpI">
                     <rect key="frame" x="64" y="617" width="247" height="31"/>
                     <connections>
-                        <action selector="sliderValueChanged:" destination="-1" eventType="valueChanged" id="Z2K-iQ-KSx"/>
+                        <action selector="sliderTouchDown:" destination="-1" eventType="touchDown" id="9mK-NT-Uz2"/>
+                        <action selector="sliderTouchUp:" destination="-1" eventType="touchUpInside" id="Neb-l5-Xrv"/>
+                        <action selector="sliderTouchUp:" destination="-1" eventType="touchDragOutside" id="Tml-KC-0lT"/>
+                        <action selector="sliderValueChanged:" destination="-1" eventType="valueChanged" id="CdR-GG-S3L"/>
                     </connections>
                 </slider>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="00:00" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5fm-tL-7jV">
@@ -42,20 +45,20 @@
                     <nil key="highlightedColor"/>
                 </label>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="status" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="EBU-Dd-nyL">
-                    <rect key="frame" x="317.5" y="582.5" width="47.5" height="21"/>
+                    <rect key="frame" x="317.5" y="582" width="47.5" height="21"/>
                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                     <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     <nil key="highlightedColor"/>
                 </label>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="TOg-P1-hYr">
-                    <rect key="frame" x="10" y="576" width="34" height="34"/>
+                    <rect key="frame" x="10" y="575.5" width="34" height="34"/>
                     <state key="normal" title="play"/>
                     <connections>
                         <action selector="playButtonClick:" destination="-1" eventType="touchUpInside" id="cj4-3r-LSU"/>
                     </connections>
                 </button>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RPZ-xc-0ni">
-                    <rect key="frame" x="54" y="576" width="49" height="34"/>
+                    <rect key="frame" x="54" y="575.5" width="49" height="34"/>
                     <state key="normal" title="pause"/>
                     <connections>
                         <action selector="pauseButtonClick:" destination="-1" eventType="touchUpInside" id="ODf-bG-7y6"/>

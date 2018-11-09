@@ -90,6 +90,8 @@ typedef NS_ENUM(NSUInteger, ZYPlayerState) {
  */
 - (void)replaceVideoWithURL:(NSURL *)videoURL;
 
+- (void)seekToTime:(NSTimeInterval)time;
+
 /**
  开始播放
  */
