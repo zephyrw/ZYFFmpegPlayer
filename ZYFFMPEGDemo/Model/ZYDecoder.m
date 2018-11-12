@@ -13,6 +13,22 @@
 #import "ZYAudioFrame.h"
 #import "ZYVideoFrame.h"
 
+typedef NS_ENUM(NSUInteger, ZYFFDecoderErrorCode) {
+    ZYFFDecoderErrorCodeFormatCreate,
+    ZYFFDecoderErrorCodeFormatOpenInput,
+    ZYFFDecoderErrorCodeFormatFindStreamInfo,
+    ZYFFDecoderErrorCodeStreamNotFound,
+    ZYFFDecoderErrorCodeCodecContextCreate,
+    ZYFFDecoderErrorCodeCodecContextSetParam,
+    ZYFFDecoderErrorCodeCodecFindDecoder,
+    ZYFFDecoderErrorCodeCodecVideoSendPacket,
+    ZYFFDecoderErrorCodeCodecAudioSendPacket,
+    ZYFFDecoderErrorCodeCodecVideoReceiveFrame,
+    ZYFFDecoderErrorCodeCodecAudioReceiveFrame,
+    ZYFFDecoderErrorCodeCodecOpen2,
+    ZYFFDecoderErrorCodeAuidoSwrInit,
+};
+
 @interface ZYDecoder()
 
 {
@@ -33,7 +49,6 @@
 @property (assign, nonatomic) NSTimeInterval bufferedDuration;
 @property (assign, nonatomic) BOOL endOfFile;
 @property (assign, nonatomic) BOOL seeking;
-@property (assign, nonatomic) BOOL prepareToDecode;
 @property (assign, nonatomic) BOOL closed;
 @property (nonatomic, assign) NSTimeInterval seekToTime;
 @property (nonatomic, assign) NSTimeInterval seekMinTime;       // default is 0
@@ -48,12 +63,12 @@ static const int max_packet_buffer_size = 15 * 1024 * 1024;
 static NSTimeInterval max_packet_sleep_full_time_interval = 0.1;
 //static NSTimeInterval max_packet_sleep_full_and_pause_time_interval = 0.5;
 
-NSError * SGFFCheckError(int result)
+NSError * ZYFFCheckError(int result)
 {
-    return SGFFCheckErrorCode(result, -1);
+    return ZYFFCheckErrorCode(result, -1);
 }
 
-NSError * SGFFCheckErrorCode(int result, NSUInteger errorCode)
+NSError * ZYFFCheckErrorCode(int result, NSUInteger errorCode)
 {
     if (result < 0) {
         char * error_string_buffer = malloc(256);
@@ -146,6 +161,7 @@ NSError * SGFFCheckErrorCode(int result, NSUInteger errorCode)
     av_dump_format(_format_context, 0, _filePath.UTF8String, 0);
     NSLog(@"-------------------------------------------");
     
+    _prepareToDecode = YES;
     if ([self.delegate respondsToSelector:@selector(decoderDidPrepareToDecodeFrames:)]) {
         [self.delegate decoderDidPrepareToDecodeFrames:self];
     }
@@ -223,7 +239,7 @@ NSError * SGFFCheckErrorCode(int result, NSUInteger errorCode)
     
     if (mediaType == AVMEDIA_TYPE_VIDEO) {
         if (self.videoDecoder) {
-            [self.videoDecoder clean];
+            [self.videoDecoder destroy];
             self.videoDecoder = nil;
         }
         self.videoDecoder = [ZYVideoDecoder videoDecoderWithCodecContext:codecContext timeBase:timeBase fps:fps];
@@ -231,7 +247,7 @@ NSError * SGFFCheckErrorCode(int result, NSUInteger errorCode)
         self.videoDecoder.streamIndex = streamIndex;
     } else {
         if (self.audioDecoder) {
-            [self.audioDecoder clean];
+            [self.audioDecoder destroy];
             self.audioDecoder = nil;
         }
         self.audioDecoder = [ZYAudioDecoder audioDecoderWithCodecContext:codecContext timeBase:timeBase];
@@ -245,8 +261,8 @@ NSError * SGFFCheckErrorCode(int result, NSUInteger errorCode)
     [self cleanAudioFrame];
     [self cleanVideoFrame];
     
-    [self.videoDecoder clean];
-    [self.audioDecoder clean];
+    [self.videoDecoder flush];
+    [self.audioDecoder flush];
     
     self.reading = YES;
     BOOL finished = NO;
@@ -260,11 +276,11 @@ NSError * SGFFCheckErrorCode(int result, NSUInteger errorCode)
             self.endOfFile = NO;
             self.playbackFinished = NO;
             
-            [self.formatContext seekFileWithFFTimebase:self.seekToTime];
+            [self seekFileWithFFTimebase:self.seekToTime];
             
             self.buffering = YES;
-            [self.audioDecoder clean];
-            [self.videoDecoder clean];
+            [self.audioDecoder flush];
+            [self.videoDecoder flush];
             self.videoDecoder.paused = NO;
             self.videoDecoder.endOfFile = NO;
             self.seeking = NO;
@@ -296,11 +312,11 @@ NSError * SGFFCheckErrorCode(int result, NSUInteger errorCode)
 //        }
         if (self.audioDecoder.size + self.videoDecoder.packetSize >= max_packet_buffer_size) {
             NSTimeInterval interval = 0;
-            if (self.paused) {
-                interval = max_packet_sleep_full_time_interval;
-            } else {
-                interval = max_packet_sleep_full_time_interval;
-            }
+//            if (self.paused) {
+//                interval = max_packet_sleep_full_time_interval;
+//            } else {
+            interval = max_packet_sleep_full_time_interval;
+//            }
             NSLog(@"read thread sleep : %f", interval);
             [NSThread sleepForTimeInterval:interval];
             continue;
@@ -319,6 +335,7 @@ NSError * SGFFCheckErrorCode(int result, NSUInteger errorCode)
             }
             break;
         }
+        
         if (packet.stream_index == self.videoDecoder.streamIndex && self.videoEnable)
         {
             NSLog(@"video : put packet");
@@ -330,7 +347,7 @@ NSError * SGFFCheckErrorCode(int result, NSUInteger errorCode)
             NSLog(@"audio : put packet");
             int result = [self.audioDecoder decodePacket:packet];
             if (result < 0) {
-                self.error = [NSError errorWithDomain:@"audio" code:result userInfo:<#(nullable NSDictionary<NSErrorUserInfoKey,id> *)#>] SGFFCheckErrorCode(result, SGFFDecoderErrorCodeCodecAudioSendPacket);
+                self.error = ZYFFCheckErrorCode(result, ZYFFDecoderErrorCodeCodecAudioSendPacket);
                 [self delegateErrorCallback];
                 continue;
             }
@@ -340,6 +357,20 @@ NSError * SGFFCheckErrorCode(int result, NSUInteger errorCode)
     self.reading = NO;
     [self checkBufferingStatus];
     
+}
+
+- (void)seekFileWithFFTimebase:(NSTimeInterval)time {
+    int64_t ts = time * AV_TIME_BASE;
+    av_seek_frame(self->_format_context, -1, ts, AVSEEK_FLAG_BACKWARD);
+}
+
+- (void)delegateErrorCallback
+{
+    if (self.error) {
+        if ([self.delegate respondsToSelector:@selector(decoder:didError:)]) {
+            [self.delegate decoder:self didError:self.error];
+        }
+    }
 }
 
 - (void)updateBufferedDurationByAudio
@@ -552,12 +583,12 @@ NSError * SGFFCheckErrorCode(int result, NSUInteger errorCode)
 - (void)closeFile {
     
     if (self.videoDecoder) {
-        [self.videoDecoder clean];
+        [self.videoDecoder destroy];
         self.videoDecoder = nil;
     }
     
     if (self.audioDecoder) {
-        [self.audioDecoder clean];
+        [self.audioDecoder destroy];
         self.audioDecoder = nil;
     }
     
@@ -586,7 +617,7 @@ NSError * SGFFCheckErrorCode(int result, NSUInteger errorCode)
     self.seeking = NO;
     self.buffering = NO;
     self.paused = NO;
-    self.prepareToDecode = NO;
+    _prepareToDecode = NO;
     self.endOfFile = NO;
     self.playbackFinished = NO;
     [self cleanAudioFrame];

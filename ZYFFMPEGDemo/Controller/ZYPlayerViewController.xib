@@ -29,7 +29,6 @@
                         <action selector="sliderTouchDown:" destination="-1" eventType="touchDown" id="9mK-NT-Uz2"/>
                         <action selector="sliderTouchUp:" destination="-1" eventType="touchUpInside" id="Neb-l5-Xrv"/>
                         <action selector="sliderTouchUp:" destination="-1" eventType="touchDragOutside" id="Tml-KC-0lT"/>
-                        <action selector="sliderValueChanged:" destination="-1" eventType="valueChanged" id="CdR-GG-S3L"/>
                     </connections>
                 </slider>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="00:00" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5fm-tL-7jV">

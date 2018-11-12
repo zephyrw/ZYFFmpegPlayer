@@ -57,7 +57,7 @@
 /**
  flush frame queue
  */
-- (void)clean;
+- (void)flush;
 
 - (void)destroy;
 

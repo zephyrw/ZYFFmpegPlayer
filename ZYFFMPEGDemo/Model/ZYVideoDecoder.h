@@ -97,7 +97,9 @@
 /**
  清空解码器数据
  */
-- (void)clean;
+- (void)destroy;
+
+- (void)flush;
 
 /**
  关闭解码器上下文

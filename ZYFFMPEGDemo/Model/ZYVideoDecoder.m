@@ -154,7 +154,13 @@ static AVPacket flushPacket;
     return self.frameQueue.count <= 0 && self.packetQueue.count <= 0;
 }
 
-- (void)clean {
+- (void)flush {
+    [self.packetQueue flush];
+    [self.frameQueue flush];
+    [self savePacket:flushPacket];
+}
+
+- (void)destroy {
 //    NSLog(@"Release video decoder");
     [self.frameQueue destroy];
     [self.packetQueue destroy];

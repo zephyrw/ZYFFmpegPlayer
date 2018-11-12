@@ -35,6 +35,8 @@
  */
 @property (nonatomic, assign, readonly) BOOL buffering;
 
+@property (atomic, assign, readonly) BOOL prepareToDecode;
+
 /**
  是否是暂停状态
  */
@@ -90,6 +92,9 @@
  @return 音频原始数据模型
  */
 - (ZYAudioFrame *)getAudioFrame;
+
+- (void)seekToTime:(NSTimeInterval)time;
+- (void)seekToTime:(NSTimeInterval)time completeHandler:(void (^)(BOOL finished))completeHandler;
 
 /**
  暂停

@@ -113,8 +113,20 @@
     
 }
 
-- (void)seekToTime:(NSTimeInterval)time {
-//    self.decoder.paused = YES;
+- (void)seekToTime:(NSTimeInterval)time
+{
+    [self seekToTime:time completeHandler:nil];
+}
+
+- (void)seekToTime:(NSTimeInterval)time completeHandler:(void (^)(BOOL finished))completeHandler
+{
+    if (!self.decoder.prepareToDecode) {
+        if (completeHandler) {
+            completeHandler(NO);
+        }
+        return;
+    }
+    [self.decoder seekToTime:time completeHandler:completeHandler];
 }
 
 - (void)cleanFrame {

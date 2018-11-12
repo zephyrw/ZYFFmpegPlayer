@@ -166,9 +166,9 @@
     
 }
 
-- (void)clean {
+- (void)flush {
 //    NSLog(@"Realese audio decoder");
-    [self.frameQueue destroy];
+    [self.frameQueue flush];
     [self.frameQueue flushFramePool];
     if (_codec_context) {
         avcodec_flush_buffers(_codec_context);

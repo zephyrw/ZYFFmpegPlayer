@@ -16,6 +16,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *totalTimeLabel;
 @property (weak, nonatomic) IBOutlet UISlider *slider;
 @property (weak, nonatomic) IBOutlet UILabel *stateLabel;
+@property (assign, nonatomic, getter=isProgressTouchDown) BOOL progressTouchDown;
 
 @end
 
@@ -88,26 +89,26 @@
         self.stateLabel.text = text;
     });
 }
+
 - (IBAction)sliderTouchDown:(UISlider *)sender {
-    [self.player pause];
+    self.progressTouchDown = YES;
+}
+
+- (IBAction)sliderTouchUp:(UISlider *)sender {
+    self.progressTouchDown = NO;
+    [self.player seekToTime:self.player.duration * sender.value];
 }
 
 - (void)progressChanged:(NSNotification *)noti {
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.slider.value = [[noti.userInfo objectForKey:kPercentKey] doubleValue];
+        if (!self.isProgressTouchDown) {
+            self.slider.value = [[noti.userInfo objectForKey:kPercentKey] doubleValue];
+        }
         self.currentTimeLabel.text = [self timeStringFromSeconds:[[noti.userInfo objectForKey:kCurrentKey] doubleValue]];
 //        NSLog(@"%f", self.slider.value);
     });
     
-}
-
-- (IBAction)sliderValueChanged:(UISlider *)sender {
-    
-}
-
-- (IBAction)sliderTouchUp:(UISlider *)sender {
-    [self.player play];
 }
 
 - (void)decodeError:(NSNotification *)noti {
